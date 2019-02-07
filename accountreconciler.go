@@ -28,13 +28,7 @@ func compareAmounts() {
 		fmt.Println(err)
 		return
 	}
-	// grab all rows
-	rows := xlsx.GetRows("sheet1")
-	for _, row := range rows {
-		for _, colCell := range row {
-			fmt.Println(colCell, "\t")
-		}
-	}
+	fmt.Println(xlsx.GetCellValue("sheet1", "A1"))
 }
 
 func appendMatches() {

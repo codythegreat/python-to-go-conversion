@@ -10,7 +10,7 @@ import (
 )
 
 type outstandingAmount struct {
-	amount      int64
+	amount      float64
 	date        string
 	description string
 }
@@ -21,7 +21,7 @@ func del_matching_data() {
 	matches = matches[:0]
 }
 
-func compareAmounts() {
+func extractAmounts() {
 	// initialize the workbook
 	xlsx, err := excelize.OpenFile("./Book1.xlsx")
 	if err != nil {
@@ -30,14 +30,35 @@ func compareAmounts() {
 	}
 	rows := xlsx.GetRows("Sheet1")
 	for currentRow := 2; currentRow <= len(rows)-4; currentRow++ {
+		floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)), 64)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
+		matches = append(matches, outstandingAmount{
+			amount:      floatAmount,
+			date:        xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)),
+			description: xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow))})
 		fmt.Println(xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)))
 		fmt.Println(xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)))
 		fmt.Println(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)))
 	}
 }
 
-func appendMatches() {
+func reduceAmounts() {
+	for i, matchX := range matches {
+		for j, matchY := range matches {
+			if matchX.amount+matchY.amount == 0 {
+				matches = append(matches[:i], matches[i+1:]...)
+				matches = append(matches[:j], matches[j+1:]...)
+			}
+		}
+	}
+}
 
+func appendMatches() {
+	for _, match := range matches {
+		fmt.Printf("%d\t%s\t%s\n", match.amount, match.description, match.date)
+	}
 }
 
 func programLoop() {
@@ -47,7 +68,8 @@ func programLoop() {
 	text := scanner.Text()
 	if text == "begin" {
 		fmt.Println("working...")
-		compareAmounts()
+		extractAmounts()
+		reduceAmounts()
 		fmt.Println("complete\n\n")
 	}
 	for i, amount := range matches {

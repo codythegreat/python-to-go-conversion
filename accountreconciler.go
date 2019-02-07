@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -28,7 +29,8 @@ func compareAmounts() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(xlsx.GetCellValue("sheet1", "A1"))
+	currentRow := 2
+	fmt.Println(xlsx.GetCellValue("sheet1", "A"+strconv.Itoa(currentRow)))
 }
 
 func appendMatches() {

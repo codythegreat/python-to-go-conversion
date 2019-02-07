@@ -7,12 +7,11 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"os"
 	"strconv"
-	"time"
 )
 
 type outstandingAmount struct {
 	amount      int64
-	date        time.Time
+	date        string
 	description string
 }
 
@@ -29,8 +28,12 @@ func compareAmounts() {
 		fmt.Println(err)
 		return
 	}
-	currentRow := 2
-	fmt.Println(xlsx.GetCellValue("sheet1", "A"+strconv.Itoa(currentRow)))
+	rows := xlsx.GetRows("Sheet1")
+	for currentRow := 2; currentRow <= len(rows)-4; currentRow++ {
+		fmt.Println(xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)))
+		fmt.Println(xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)))
+		fmt.Println(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)))
+	}
 }
 
 func appendMatches() {

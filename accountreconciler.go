@@ -37,6 +37,10 @@ func compareAmounts() {
 	}
 }
 
+func appendMatches() {
+
+}
+
 func programLoop() {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println(`type "begin" to start the program.`)
@@ -54,7 +58,12 @@ func programLoop() {
 	scanner.Scan()
 	text = scanner.Text()
 	if text != "" {
-		// do something
+		del_matching_data()
+		programLoop()
+	} else {
+		appendMatches()
+		del_matching_data()
+		programLoop()
 	}
 }
 

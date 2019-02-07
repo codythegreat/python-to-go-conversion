@@ -32,7 +32,7 @@ func compareAmounts() {
 	rows := xlsx.GetRows("sheet1")
 	for _, row := range rows {
 		for _, colCell := range row {
-			fmt.Print(colCell, "\t")
+			fmt.Println(colCell, "\t")
 		}
 	}
 }

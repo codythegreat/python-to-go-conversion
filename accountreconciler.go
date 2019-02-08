@@ -71,9 +71,11 @@ func appendMatches(name string) {
 	}
 	masterBook.NewSheet(name)
 	for i, match := range matches {
-		masterBook.SetCellValue(name, "A"+strconv.Itoa(i+1), match.amount)
-		masterBook.SetCellValue(name, "B"+strconv.Itoa(i+1), match.description)
-		masterBook.SetCellValue(name, "C"+strconv.Itoa(i+1), match.date)
+		if match.amount != 0 {
+			masterBook.SetCellValue(name, "A"+strconv.Itoa(i+1), match.amount)
+			masterBook.SetCellValue(name, "B"+strconv.Itoa(i+1), match.description)
+			masterBook.SetCellValue(name, "C"+strconv.Itoa(i+1), match.date)
+		}
 	}
 	err = masterBook.SaveAs("./account_recs.xlsx")
 	if err != nil {

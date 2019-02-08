@@ -45,7 +45,7 @@ func extractAmounts() {
 func reduceAmounts() {
 	for i, matchX := range matches {
 		for j, matchY := range matches {
-			if matchX.amount+matchY.amount == 0 {
+			if matchX.amount+matchY.amount > -.01 && matchX.amount+matchY.amount < .01 {
 				if i < j {
 					matches = append(matches[:i], matches[i+1:]...)
 					matches = append(matches[:j-1], matches[j:]...)

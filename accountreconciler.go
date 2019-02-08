@@ -43,7 +43,7 @@ func extractAmounts() {
 }
 
 func testPrint(i, j float64) {
-	fmt.Printf("Deleting %f and %f", i, j)
+	fmt.Printf("Deleting %f and %f\n", i, j)
 }
 
 func reduceAmounts() {

@@ -4,9 +4,10 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/360EntSecGroup-Skylar/excelize"
 	"os"
 	"strconv"
+
+	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
 type outstandingAmount struct {
@@ -30,17 +31,14 @@ func extractAmounts() {
 	}
 	rows := xlsx.GetRows("Sheet1")
 	for currentRow := 2; currentRow <= len(rows)-4; currentRow++ {
-		floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)), 64)
+		floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)), 64)
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
 		matches = append(matches, outstandingAmount{
 			amount:      floatAmount,
 			date:        xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)),
-			description: xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow))})
-		fmt.Println(xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)))
-		fmt.Println(xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)))
-		fmt.Println(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)))
+			description: xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow))})
 	}
 }
 
@@ -48,17 +46,43 @@ func reduceAmounts() {
 	for i, matchX := range matches {
 		for j, matchY := range matches {
 			if matchX.amount+matchY.amount == 0 {
-				matches = append(matches[:i], matches[i+1:]...)
-				matches = append(matches[:j], matches[j+1:]...)
+				if i < j {
+					matches = append(matches[:i], matches[i+1:]...)
+					matches = append(matches[:j-1], matches[j:]...)
+				} else {
+					matches = append(matches[:j], matches[j+1:]...)
+					matches = append(matches[:i-1], matches[i:]...)
+				}
 			}
 		}
 	}
 }
 
-func appendMatches() {
+func printMatches() {
+	var total float64
 	for _, match := range matches {
-		fmt.Printf("%d\t%s\t%s\n", match.amount, match.description, match.date)
+		total += match.amount
+		fmt.Printf("%f\t%s\t%s\n", match.amount, match.description, match.date)
 	}
+	fmt.Printf("\nTotal: %f\n", total)
+}
+
+func appendMatches(name string) {
+	masterBook, err := excelize.OpenFile("./account_recs.xlsx")
+	if err != nil {
+		fmt.Printf("While opening master file: %v", err)
+	}
+	masterBook.NewSheet(name)
+	for i, match := range matches {
+		masterBook.SetCellValue(name, "A"+strconv.Itoa(i+1), match.amount)
+		masterBook.SetCellValue(name, "B"+strconv.Itoa(i+1), match.description)
+		masterBook.SetCellValue(name, "C"+strconv.Itoa(i+1), match.date)
+	}
+	err = masterBook.SaveAs("./account_recs.xlsx")
+	if err != nil {
+		fmt.Printf("While saving master excel: %v", err)
+	}
+
 }
 
 func programLoop() {
@@ -67,22 +91,21 @@ func programLoop() {
 	scanner.Scan()
 	text := scanner.Text()
 	if text == "begin" {
-		fmt.Println("working...")
+		fmt.Println("working...\n")
 		extractAmounts()
 		reduceAmounts()
-		fmt.Println("complete\n\n")
-	}
-	for i, amount := range matches {
-		fmt.Printf("%d\t%d", i, amount)
+		printMatches()
+		fmt.Println("complete\n")
 	}
 	fmt.Println("Input sheet name:")
 	scanner.Scan()
 	text = scanner.Text()
-	if text != "" {
+	fmt.Println(text)
+	if text == "" {
 		del_matching_data()
 		programLoop()
 	} else {
-		appendMatches()
+		appendMatches(text)
 		del_matching_data()
 		programLoop()
 	}

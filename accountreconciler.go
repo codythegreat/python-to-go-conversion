@@ -47,9 +47,9 @@ func testPrint(i, j float64) {
 }
 
 func reduceAmounts() {
-	for i, matchX := range matches {
-		for j, matchY := range matches {
-			if matchX.amount+matchY.amount > -.01 && matchX.amount+matchY.amount < .01 {
+	for i, _ := range matches {
+		for j, _ := range matches {
+			if matches[i].amount+matches[j].amount > -.01 && matches[i].amount+matches[j].amount < .01 {
 				if i < j {
 					testPrint(matches[i].amount, matches[j].amount)
 					matches = append(matches[:i], matches[i+1:]...)

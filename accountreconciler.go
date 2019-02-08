@@ -42,14 +42,20 @@ func extractAmounts() {
 	}
 }
 
+func testPrint(i, j float64) {
+	fmt.Printf("Deleting %f and %f", i, j)
+}
+
 func reduceAmounts() {
 	for i, matchX := range matches {
 		for j, matchY := range matches {
 			if matchX.amount+matchY.amount > -.01 && matchX.amount+matchY.amount < .01 {
 				if i < j {
+					testPrint(matches[i].amount, matches[j].amount)
 					matches = append(matches[:i], matches[i+1:]...)
 					matches = append(matches[:j-1], matches[j:]...)
 				} else {
+					testPrint(matches[i].amount, matches[j].amount)
 					matches = append(matches[:j], matches[j+1:]...)
 					matches = append(matches[:i-1], matches[i:]...)
 				}

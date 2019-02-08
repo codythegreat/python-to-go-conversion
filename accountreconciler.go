@@ -42,23 +42,12 @@ func extractAmounts() {
 	}
 }
 
-func testPrint(i, j float64) {
-	fmt.Printf("Deleting %f and %f\n", i, j)
-}
-
 func reduceAmounts() {
 	for i, _ := range matches {
 		for j, _ := range matches {
 			if matches[i].amount+matches[j].amount > -.01 && matches[i].amount+matches[j].amount < .01 {
-				if i < j {
-					testPrint(matches[i].amount, matches[j].amount)
-					matches = append(matches[:i], matches[i+1:]...)
-					matches = append(matches[:j-1], matches[j:]...)
-				} else {
-					testPrint(matches[i].amount, matches[j].amount)
-					matches = append(matches[:j], matches[j+1:]...)
-					matches = append(matches[:i-1], matches[i:]...)
-				}
+				matches[i].amount = 0
+				matches[j].amount = 0
 			}
 		}
 	}
@@ -68,7 +57,9 @@ func printMatches() {
 	var total float64
 	for _, match := range matches {
 		total += match.amount
-		fmt.Printf("%f\t%s\t%s\n", match.amount, match.description, match.date)
+		if match.amount != 0 {
+			fmt.Printf("%f\t%s\t%s\n", match.amount, match.description, match.date)
+		}
 	}
 	fmt.Printf("\nTotal: %f\n", total)
 }

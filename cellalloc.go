@@ -35,6 +35,10 @@ func main() {
 			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" @")
 		}
 	}
+	err = cellBook.SaveAs("./cellular.xlsx")
+	if err != nil {
+		fmt.Printf("While saving cellular.xlsx: %v", err)
+	}
 }
 func readPdf(path string) (string, error) {
 	f, r, err := pdf.Open(path)

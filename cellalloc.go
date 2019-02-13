@@ -24,6 +24,10 @@ func main() {
 
 	for i := 2; i < len(rows); i++ {
 		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
+		// avoid "staff", "managers", or other names
+		if len(name) < 2 {
+			continue
+		}
 		nameFormattedToPDF := name[1] + ", " + name[0]
 		nameWithInitial := name[1] + ", " + string(name[0][0])
 		fmt.Printf("searching for name at %d:\t%s\t%s\n", i, nameFormattedToPDF, nameWithInitial)

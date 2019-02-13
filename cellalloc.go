@@ -29,10 +29,13 @@ func main() {
 		fmt.Println("searching for name:\t%s\t%s\n", nameFormattedToPDF, nameWithInitial)
 		if strings.Contains(pdfText, nameFormattedToPDF) {
 			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" $")
+			fmt.Println("appending to sheet")
 		} else if strings.Contains(pdfText, nameWithInitial) {
 			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" $$")
+			fmt.Println("appending to sheet")
 		} else {
 			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" @")
+			fmt.Println("appending to sheet")
 		}
 	}
 	err = cellBook.SaveAs("./cellular.xlsx")

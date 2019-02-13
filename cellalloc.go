@@ -50,7 +50,7 @@ func main() {
 		}
 	}
 	// save the edited book
-	err = cellBook.SaveAs("./cellular.xlsx")
+	err = cellBook.SaveAs("./cellular_complete.xlsx")
 	if err != nil {
 		fmt.Printf("While saving cellular.xlsx: %v", err)
 	}

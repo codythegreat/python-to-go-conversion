@@ -15,6 +15,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("While reading PDF: %v\n", err)
 	}
+	fmt.Println(pdfText[:50])
 	cellBook, err := excelize.OpenFile("./cellular.xlsx")
 	rows := cellBook.GetRows("Sheet1")
 	if err != nil {
@@ -25,6 +26,7 @@ func main() {
 		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		nameFormattedToPDF := name[1] + ", " + name[0]
 		nameWithInitial := name[1] + ", " + string(name[0][0])
+		fmt.Println("searching for name:\t%s\t%s\n", nameFormattedToPDF, nameWithInitial)
 		if strings.Contains(pdfText, nameFormattedToPDF) {
 			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" $")
 		} else if strings.Contains(pdfText, nameWithInitial) {

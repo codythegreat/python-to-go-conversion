@@ -13,14 +13,15 @@ import (
 func main() {
 	pdfText, err := readPdf("employees.pdf")
 	if err != nil {
-		panic(err)
+		fmt.Printf("While reading PDF: %v\n", err)
 	}
 	cellBook, err := excelize.OpenFile("./cellular.xlsx")
+	rows := cellBook.GetRows("Sheet1")
 	if err != nil {
 		fmt.Printf("While opening cellular file: %v", err)
 	}
 
-	for i := 2; i != 3000; i++ {
+	for i := 2; i < len(rows); i++ {
 		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		nameFormattedToPDF := name[1] + ", " + name[0]
 		nameWithInitial := name[1] + ", " + string(name[0][0])

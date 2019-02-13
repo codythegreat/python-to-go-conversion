@@ -26,7 +26,7 @@ func main() {
 		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		nameFormattedToPDF := name[1] + ", " + name[0]
 		nameWithInitial := name[1] + ", " + string(name[0][0])
-		fmt.Println("searching for name:\t%s\t%s\n", nameFormattedToPDF, nameWithInitial)
+		fmt.Printf("searching for name at %d:\t%s\t%s\n", i, nameFormattedToPDF, nameWithInitial)
 		if strings.Contains(pdfText, nameFormattedToPDF) {
 			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" $")
 			fmt.Println("appending to sheet")

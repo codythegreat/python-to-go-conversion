@@ -11,42 +11,52 @@ import (
 )
 
 func main() {
+	// parse the PDF file to a string variable
 	pdfText, err := readPdf("employees.pdf")
 	if err != nil {
 		fmt.Printf("While reading PDF: %v\n", err)
 	}
-	fmt.Println(pdfText[:50])
+	// open the existing excel file
 	cellBook, err := excelize.OpenFile("./cellular.xlsx")
+	// get the maximum row number in the sheet (used in for loop)
 	rows := cellBook.GetRows("Sheet1")
 	if err != nil {
 		fmt.Printf("While opening cellular file: %v", err)
 	}
-
+	// starting at row 2 and moving down to the end of the book
 	for i := 2; i < len(rows); i++ {
+		// take the original name and split at the space
 		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		// avoid "staff", "managers", or other names
 		if len(name) < 2 {
 			continue
 		}
+		// reverse the order to match the PDF's formatting
 		nameFormattedToPDF := name[1] + ", " + name[0]
+		// if the above fails, test with just the first initial for "partial match"
 		nameWithInitial := name[1] + ", " + string(name[0][0])
-		fmt.Printf("searching for name at %d:\t%s\t%s\n", i, nameFormattedToPDF, nameWithInitial)
+		// Print the row and name being searched
+		fmt.Printf("searching for name at row %d:\t%s\n", i, nameFormattedToPDF)
+
 		if strings.Contains(pdfText, nameFormattedToPDF) {
-			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" $")
-			fmt.Println("appending to sheet")
+			cellBook.SetCellValue("Sheet1", "N"+strconv.Itoa(i), "PERFECT MATCH")
+			fmt.Println("PERFECT MATCH")
 		} else if strings.Contains(pdfText, nameWithInitial) {
-			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" $$")
-			fmt.Println("appending to sheet")
+			cellBook.SetCellValue("Sheet1", "N"+strconv.Itoa(i), "PARTIAL MATCH")
+			fmt.Println("PARTIAL MATCH")
 		} else {
-			cellBook.SetCellValue("Sheet1", "M"+strconv.Itoa(i), cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i))+" @")
-			fmt.Println("appending to sheet")
+			cellBook.SetCellValue("Sheet1", "N"+strconv.Itoa(i), "NONMATCH")
+			fmt.Println("NONMATCH")
 		}
 	}
+	// save the edited book
 	err = cellBook.SaveAs("./cellular.xlsx")
 	if err != nil {
 		fmt.Printf("While saving cellular.xlsx: %v", err)
 	}
 }
+
+// function for parsing the PDF file
 func readPdf(path string) (string, error) {
 	f, r, err := pdf.Open(path)
 	// remember to close the pdf file

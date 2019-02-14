@@ -52,7 +52,7 @@ func reduceAmounts() {
 	// if they do, zero out their amounts
 	for i, _ := range matches {
 		for j, _ := range matches {
-			if matches[i].amount+matches[j].amount > -.01 && matches[i].amount+matches[j].amount < .01 {
+			if matches[i].amount+matches[j].amount > -.005 && matches[i].amount+matches[j].amount < .005 {
 				matches[i].amount = 0
 				matches[j].amount = 0
 			}

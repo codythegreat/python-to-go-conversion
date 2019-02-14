@@ -61,6 +61,15 @@ func printMatches() {
 			fmt.Printf("%f\t%s\t%s\n", match.amount, match.description, match.date)
 		}
 	}
+	// test bottom 10 matches to see if they make up the total amount
+	var recentEntriesTotal float64
+	for i := len(matches) - 1; i > len(matches)-10; i-- {
+		recentEntriesTotal += matches[i].amount
+		if recentEntriesTotal == total {
+			fmt.Printf("Bottom %d matches make up amount.\n", i-len(matches))
+			break
+		}
+	}
 	fmt.Printf("\nTotal: %f\n", total)
 }
 

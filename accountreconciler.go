@@ -10,15 +10,18 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
+// each "match" will assume this struct
 type outstandingAmount struct {
 	amount      float64
 	date        string
 	description string
 }
 
+// initialize slice to hold all matches from each book
 var matches []outstandingAmount
 
 func del_matching_data() {
+	// clear the matches variable completely
 	matches = matches[:0]
 }
 
@@ -29,7 +32,9 @@ func extractAmounts() {
 		fmt.Println(err)
 		return
 	}
+	// get the maximum row of the sheet
 	rows := xlsx.GetRows("Sheet1")
+	// append wanted information from each row to matches
 	for currentRow := 2; currentRow <= len(rows)-4; currentRow++ {
 		floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)), 64)
 		if err != nil {
@@ -43,6 +48,8 @@ func extractAmounts() {
 }
 
 func reduceAmounts() {
+	// checks all amounts agains one another to see if they zero out (what we want)
+	// if they do, zero out their amounts
 	for i, _ := range matches {
 		for j, _ := range matches {
 			if matches[i].amount+matches[j].amount > -.01 && matches[i].amount+matches[j].amount < .01 {
@@ -54,40 +61,50 @@ func reduceAmounts() {
 }
 
 func printMatches() {
+	// create a total variable
 	var total float64
+	// loop over and print all matches that do not equal zero. append each to total
 	for _, match := range matches {
 		total += match.amount
 		if match.amount != 0 {
 			fmt.Printf("%f\t%s\t%s\n", match.amount, match.description, match.date)
 		}
 	}
-	// test bottom 10 matches to see if they make up the total amount
+	// print total
+	fmt.Printf("\nTotal: %f\n", total)
+	// create another total for up to 10 newest entries
 	var recentEntriesTotal float64
+	// starting from the last item, append to recent total. test if recent total == total
+	// if it does, print the # of amounts from the bottom that make the total.
 	for i := len(matches) - 1; i > len(matches)-10; i-- {
 		recentEntriesTotal += matches[i].amount
 		if recentEntriesTotal == total {
-			fmt.Printf("Bottom %d matches make up amount.\n", i-len(matches))
+			fmt.Printf("Bottom %d matches make up amount.\n", len(matches)-i)
 			break
 		}
 	}
-	fmt.Printf("\nTotal: %f\n", total)
 }
 
 func appendMatches(name string) {
+	// open the book holding all account data
 	masterBook, err := excelize.OpenFile("./account_recs.xlsx")
 	if err != nil {
 		fmt.Printf("While opening master file: %v", err)
 	}
+	// add a new sheet where the name is the user's input
 	masterBook.NewSheet(name)
-	rowNumber := 0
+	// initialize a row counter starting at 1
+	rowNumber := 1
+	// write all matches that don't equal zero to the master book
 	for _, match := range matches {
 		if match.amount != 0 {
-			masterBook.SetCellValue(name, "A"+strconv.Itoa(rowNumber+1), match.amount)
-			masterBook.SetCellValue(name, "B"+strconv.Itoa(rowNumber+1), match.description)
-			masterBook.SetCellValue(name, "C"+strconv.Itoa(rowNumber+1), match.date)
+			masterBook.SetCellValue(name, "A"+strconv.Itoa(rowNumber), match.amount)
+			masterBook.SetCellValue(name, "B"+strconv.Itoa(rowNumber), match.description)
+			masterBook.SetCellValue(name, "C"+strconv.Itoa(rowNumber), match.date)
 			rowNumber++
 		}
 	}
+	// save the book
 	err = masterBook.SaveAs("./account_recs.xlsx")
 	if err != nil {
 		fmt.Printf("While saving master excel: %v", err)
@@ -96,10 +113,13 @@ func appendMatches(name string) {
 }
 
 func programLoop() {
+	// initialize scanner that will read user input
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println(`type "begin" to start the program.`)
+	// grab the input and assign it to text
 	scanner.Scan()
 	text := scanner.Text()
+	// if begin, find and print all matches from Book1
 	if text == "begin" {
 		fmt.Println("working...\n")
 		extractAmounts()
@@ -110,7 +130,8 @@ func programLoop() {
 	fmt.Println("Input sheet name:")
 	scanner.Scan()
 	text = scanner.Text()
-	fmt.Println(text)
+	// if no sheet name, delete values and start over
+	// else create a new sheet in the master book and write the values to it
 	if text == "" {
 		del_matching_data()
 		programLoop()
@@ -122,5 +143,6 @@ func programLoop() {
 }
 
 func main() {
+	// run the loop
 	programLoop()
 }

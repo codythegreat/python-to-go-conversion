@@ -24,8 +24,14 @@ func main() {
 		fmt.Printf("While opening cellular file: %v", err)
 	}
 	// starting at row 2 and moving down to the end of the book
+	var name []string
 	for i := 2; i < len(rows); i++ {
 		// take the original name and split at the space
+		if strings.Contains(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ",") {
+			name[0] = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")[1]
+			name[1] = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")[0]
+
+		}
 		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		// avoid "staff", "managers", or other names
 		if len(name) < 2 {

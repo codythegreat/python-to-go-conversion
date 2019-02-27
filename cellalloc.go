@@ -30,9 +30,9 @@ func main() {
 		if strings.Contains(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ",") {
 			name[0] = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")[1]
 			name[1] = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")[0]
-
+		} else {
+			name = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		}
-		name := strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		// avoid "staff", "managers", or other names
 		if len(name) < 2 {
 			continue

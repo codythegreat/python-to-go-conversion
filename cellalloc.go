@@ -25,12 +25,16 @@ func main() {
 	}
 	// starting at row 2 and moving down to the end of the book
 	var name []string
+	var commaName bool
+	var nameFormattedToPDF string
+	var nameWithInitial string
 	for i := 2; i < len(rows); i++ {
 		// take the original name and split at the space
 		if strings.Contains(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ",") {
-			name[0] = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")[1]
-			name[1] = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")[0]
+			commaName = true
+			name = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), ", ")
 		} else {
+			commaName = false
 			name = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		}
 		// avoid "staff", "managers", or other names
@@ -38,10 +42,13 @@ func main() {
 			continue
 		}
 		// reverse the order to match the PDF's formatting
-		nameFormattedToPDF := name[1] + ", " + name[0]
-		// if the above fails, test with just the first initial for "partial match"
-		nameWithInitial := name[1] + ", " + string(name[0][0])
-		// Print the row and name being searched
+		if commaName {
+			nameFormattedToPDF = name[0] + ", " + name[1]
+			nameWithInitial = name[0] + ", " + string(name[1][0])
+		} else {
+			nameFormattedToPDF = name[1] + ", " + name[0]
+			nameWithInitial = name[1] + ", " + string(name[0][0])
+		}
 		fmt.Printf("searching for name at row %d:\t%s\n", i, nameFormattedToPDF)
 
 		if strings.Contains(pdfText, nameFormattedToPDF) {

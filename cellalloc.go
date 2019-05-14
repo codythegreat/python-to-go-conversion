@@ -37,7 +37,7 @@ func main() {
 			commaName = false
 			name = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		}
-		// avoid "staff", "managers", or other names
+		// avoid "staff", "managers", or other single word names
 		if len(name) < 2 {
 			continue
 		}

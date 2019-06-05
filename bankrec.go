@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"os"
+	"strings"
 )
 
 // struct to hold information on each entry
@@ -45,5 +46,17 @@ func extractEntries() {
 			amount:       floatAmount,
 			date:         xlsx.GetCellValue("JDE", "C"+strconv.Itoa(currentRow)),
 			explaination: xlsx.GetCellValue("JDE", "D"+strconv.Itoa(currentRow))})
+	}
+}
+
+func compareEntries() {
+	res, err := docconv.ConvertPath("pdf.PDF")
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+	for i, item := range entries {
+		if strings.Contains(res, fmt.Sprintf("%f", item.amount)) {
+			xlsx.SetCellValue("JDE", "F"+strconv.Itoa(9+i), "match")
+		}
 	}
 }

@@ -9,7 +9,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 // struct to hold information on each entry
@@ -31,11 +30,9 @@ func getFileName() string {
 	return text
 }
 
-func extractEntries() {
-	// get the name of the book from the user
-	fileString := getFileName()
+func extractEntries(name string) {
 	// initialize the workbook
-	xlsx, err := excelize.OpenFile("./" + fileString)
+	xlsx, err := excelize.OpenFile("./" + name)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -55,37 +52,36 @@ func extractEntries() {
 }
 
 func pullPDFAmounts() []string {
-	//reopen exce
-	xlsx, err := excelize.OpenFile("./" + fileString)
-	if err != nil {
-		fmt.Println(err)
-	}
 	// pull all text from pdf doc
 	res, err := docconv.ConvertPath("pdf.PDF")
 	if err != nil {
 		fmt.Printf("%v", err)
 	}
 	// use a regex to sort and find only dollar amounts
-	lineAmounts := bankAmtReg.FindAllString(res, -1)
+	lineAmounts := bankAmtReg.FindAllString(fmt.Sprintf("%s", res), -1)
 	// print the resuls and original text
 	fmt.Println(lineAmounts)
 	fmt.Println(res)
 	return lineAmounts
 }
-func compareEntries() {
-	xlsx, err := excelize.OpenFile("./" + fileString)
+func compareEntries(name string, lines []string) {
+	xlsx, err := excelize.OpenFile("./" + name)
 	if err != nil {
 		fmt.Println(err)
 	}
 	for i, item := range entries {
-		if strings.Contains(lineAmounts, fmt.Sprintf("%f", item.amount)) {
-			xlsx.SetCellValue("JDE", "F"+strconv.Itoa(9+i), "match")
+		for _, line := range lines {
+			if line == fmt.Sprintf("%s", item.amount) {
+				xlsx.SetCellValue("JDE", "F"+strconv.Itoa(9+i), "match")
+			}
 		}
 	}
 }
 
 func main() {
+	// get the name of the book from the user
+	fileString := getFileName()
 	lineAmounts := pullPDFAmounts()
-	extractEntries()
-	compareEntries()
+	extractEntries(fileString)
+	compareEntries(fileString, lineAmounts)
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -18,6 +19,8 @@ type entry struct {
 
 // slice that holds all entries
 var entries []entry
+var bankAmounts []string
+var bankAmtReg = regexp.MustCompile(`\d+.\d{2}\-?`)
 
 func getFileName() {
 	reader := bufio.NewReader(os.Stdin)
@@ -49,14 +52,29 @@ func extractEntries() {
 	}
 }
 
-func compareEntries() {
+func pullPDFAmounts() {
+	// pull all text from pdf doc
 	res, err := docconv.ConvertPath("pdf.PDF")
 	if err != nil {
 		fmt.Printf("%v", err)
 	}
+	// use a regex to sort and find only dollar amounts
+	lineAmounts := bankAmtReg.FindAllString(res)
+	// print the resuls and original text
+	fmt.Println(lineAmounts)
+	fmt.Println(res)
+	return lineAmounts
+}
+func compareEntries() {
 	for i, item := range entries {
-		if strings.Contains(res, fmt.Sprintf("%f", item.amount)) {
+		if strings.Contains(lineAmounts, fmt.Sprintf("%f", item.amount)) {
 			xlsx.SetCellValue("JDE", "F"+strconv.Itoa(9+i), "match")
 		}
 	}
+}
+
+func main() {
+	lineAmounts := pullPDFAmounts()
+	extractEntries()
+	compareEntries()
 }

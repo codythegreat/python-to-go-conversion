@@ -15,6 +15,7 @@ type outstandingAmount struct {
 	amount      float64
 	date        string
 	description string
+	batchNumb   string
 }
 
 // initialize slice to hold all matches from each book
@@ -43,7 +44,8 @@ func extractAmounts() {
 		matches = append(matches, outstandingAmount{
 			amount:      floatAmount,
 			date:        xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)),
-			description: xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow))})
+			description: xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)),
+			batchNumb:   xlsx.GetCellValue("sheet1", "R"+strconv.Itoa(currentRow))})
 	}
 }
 
@@ -101,6 +103,7 @@ func appendMatches(name string) {
 			masterBook.SetCellValue(name, "A"+strconv.Itoa(rowNumber), match.amount)
 			masterBook.SetCellValue(name, "B"+strconv.Itoa(rowNumber), match.description)
 			masterBook.SetCellValue(name, "C"+strconv.Itoa(rowNumber), match.date)
+			masterBook.SetCellValue(name, "D"+strconv.Itoa(rowNumber), match.batchNumb)
 			rowNumber++
 		}
 	}

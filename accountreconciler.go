@@ -80,7 +80,7 @@ func printMatches() {
 	// if it does, print the # of amounts from the bottom that make the total.
 	for i := len(matches) - 1; i > len(matches)-10; i-- {
 		recentEntriesTotal += matches[i].amount
-		if recentEntriesTotal == total {
+		if recentEntriesTotal < total+.05 && recentEntriesTotal > total-.05 {
 			fmt.Printf("Bottom %d matches make up amount.\n", len(matches)-i)
 			break
 		}

@@ -15,6 +15,7 @@ type outstandingAmount struct {
 	amount      float64
 	date        string
 	description string
+	remark      string
 	batchNumb   string
 }
 
@@ -45,6 +46,7 @@ func extractAmounts() {
 			amount:      floatAmount,
 			date:        xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)),
 			description: xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)),
+			remark:      xlsx.GetCellValue("sheet1", "AJ"+strconv.Itoa(currentRow)),
 			batchNumb:   xlsx.GetCellValue("sheet1", "R"+strconv.Itoa(currentRow))})
 	}
 }
@@ -102,8 +104,9 @@ func appendMatches(name string) {
 		if match.amount != 0 {
 			masterBook.SetCellValue(name, "A"+strconv.Itoa(rowNumber), match.amount)
 			masterBook.SetCellValue(name, "B"+strconv.Itoa(rowNumber), match.description)
-			masterBook.SetCellValue(name, "C"+strconv.Itoa(rowNumber), match.date)
-			masterBook.SetCellValue(name, "D"+strconv.Itoa(rowNumber), match.batchNumb)
+			masterBook.SetCellValue(name, "C"+strconv.Itoa(rowNumber), match.remark)
+			masterBook.SetCellValue(name, "D"+strconv.Itoa(rowNumber), match.date)
+			masterBook.SetCellValue(name, "E"+strconv.Itoa(rowNumber), match.batchNumb)
 			rowNumber++
 		}
 	}

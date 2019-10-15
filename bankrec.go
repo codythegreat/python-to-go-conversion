@@ -1,4 +1,5 @@
 // app that analyzes bank statement PDF and bank rec excel sheet for matching amounts
+// todo : fix hardcoded file names and work on pulling pdf values into go
 package main
 
 import (
@@ -32,28 +33,43 @@ func getFileName() string {
 
 func extractEntries(name string) {
 	// initialize the workbook
-	xlsx, err := excelize.OpenFile("./" + name)
+	xlsx, err := excelize.OpenFile("Book1.xlsx")
 	if err != nil {
 		fmt.Println(err)
 	}
 	// get maximum row of JDE sheet
-	rows := xlsx.GetRows("JDE")
+	rows, err := xlsx.GetRows("JDE")
+	if err != nil {
+		fmt.Println(err)
+	}
 	// extract entries from JDE sheet
 	for currentRow := 9; currentRow <= len(rows); currentRow++ {
-		floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("JDE", "E"+strconv.Itoa(currentRow)), 64)
+		something, err := xlsx.GetCellValue("JDE", "E"+strconv.Itoa(currentRow))
+		if err != nil {
+			fmt.Println(err)
+		}
+		floatAmount, err := strconv.ParseFloat(something, 64)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
+		dt, err := xlsx.GetCellValue("JDE", "C"+strconv.Itoa(currentRow))
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
+		exp, err := xlsx.GetCellValue("JDE", "D"+strconv.Itoa(currentRow))
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
 		entries = append(entries, entry{
 			amount:       floatAmount,
-			date:         xlsx.GetCellValue("JDE", "C"+strconv.Itoa(currentRow)),
-			explaination: xlsx.GetCellValue("JDE", "D"+strconv.Itoa(currentRow))})
+			date:         dt,
+			explaination: exp})
 	}
 }
 
 func pullPDFAmounts() []string {
 	// pull all text from pdf doc
-	res, err := docconv.ConvertPath("pdf.PDF")
+	res, err := docconv.ConvertPath("bank-statement.pdf")
 	if err != nil {
 		fmt.Printf("%v", err)
 	}
@@ -65,7 +81,7 @@ func pullPDFAmounts() []string {
 	return lineAmounts
 }
 func compareEntries(name string, lines []string) {
-	xlsx, err := excelize.OpenFile("./" + name)
+	xlsx, err := excelize.OpenFile("Book1.xlsx")
 	if err != nil {
 		fmt.Println(err)
 	}

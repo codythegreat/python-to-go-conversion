@@ -22,18 +22,19 @@ type entry struct {
 // slice that holds all entries
 var entries []entry
 var bankAmounts []string
-var bankAmtReg = regexp.MustCompile(`\d+.\d{2}\-?`)
+var bankAmtReg = regexp.MustCompile(`\d*,?\d+\.\d{2}\-?`)
 
 func getFileName() string {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter the book name containing this months entries: ")
-	text, _ := reader.ReadString('\n')
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("Enter the book name containing this months entries: ")
+	scanner.Scan()
+	text := scanner.Text()
 	return text
 }
 
 func extractEntries(name string) {
 	// initialize the workbook
-	xlsx, err := excelize.OpenFile("Book1.xlsx")
+	xlsx, err := excelize.OpenFile(name)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -77,11 +78,10 @@ func pullPDFAmounts() []string {
 	lineAmounts := bankAmtReg.FindAllString(fmt.Sprintf("%s", res), -1)
 	// print the resuls and original text
 	fmt.Println(lineAmounts)
-	fmt.Println(res)
 	return lineAmounts
 }
 func compareEntries(name string, lines []string) {
-	xlsx, err := excelize.OpenFile("Book1.xlsx")
+	xlsx, err := excelize.OpenFile(name)
 	if err != nil {
 		fmt.Println(err)
 	}

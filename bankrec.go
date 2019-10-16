@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // struct to hold information on each entry
@@ -40,14 +41,14 @@ func extractEntries(name string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	// get maximum row of JDE sheet
-	rows, err := xlsx.GetRows("JDE")
+	// get maximum row of 605 sheet
+	rows, err := xlsx.GetRows("605")
 	if err != nil {
 		fmt.Println(err)
 	}
-	// extract entries from JDE sheet
+	// extract entries from 605 sheet
 	for currentRow := 9; currentRow <= len(rows); currentRow++ {
-		something, err := xlsx.GetCellValue("JDE", "E"+strconv.Itoa(currentRow))
+		something, err := xlsx.GetCellValue("605", "E"+strconv.Itoa(currentRow))
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -55,11 +56,11 @@ func extractEntries(name string) {
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
-		dt, err := xlsx.GetCellValue("JDE", "C"+strconv.Itoa(currentRow))
+		dt, err := xlsx.GetCellValue("605", "C"+strconv.Itoa(currentRow))
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
-		exp, err := xlsx.GetCellValue("JDE", "D"+strconv.Itoa(currentRow))
+		exp, err := xlsx.GetCellValue("605", "D"+strconv.Itoa(currentRow))
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
@@ -68,6 +69,7 @@ func extractEntries(name string) {
 			date:         dt,
 			explaination: exp})
 	}
+	fmt.Println(entries)
 }
 
 func pullPDFAmounts() [2][]string {
@@ -88,21 +90,26 @@ func pullPDFAmounts() [2][]string {
 	// print the resuls and original text
 	return slicesRegex
 }
-func pdfAmountsToExcel(strAmts []string) {
-	// convert amounts to float64
+func pdfAmountsToExcel(data [2][]string) {
 	var pdfAmounts []float64
-	for i, _ := range strAmts {
-		floatAmt, err := strconv.ParseFloat(strAmts[i], 64)
+	for i, _ := range data[1] {
+		floatAmt, err := strconv.ParseFloat(strings.Replace(data[1][i],",","", -1), 64)
 		if err != nil {
 			fmt.Println(err)
 		}
-		pdfAmounts[i] = floatAmt 
+		pdfAmounts = append(pdfAmounts, floatAmt)
 	}
-	// initialize a new excel sheet
-
-	// input amounts into the excel sheet
-
-	// save the sheet
+	f := excelize.NewFile()
+	for i, _ := range data[0] {
+		f.SetCellValue("Sheet1", "A" + strconv.Itoa(i), strings.Replace(data[0][i], "\n", "-", -1))
+	}
+	for i, _ := range pdfAmounts {
+		f.SetCellValue("Sheet1", "B" + strconv.Itoa(i), pdfAmounts[i])
+	}
+    err := f.SaveAs("./Statement.xlsx")
+    if err != nil {
+        fmt.Println(err)
+    }
 }
 
 //todo expand function to look at near matches, dates, description matching, etc
@@ -114,7 +121,7 @@ func compareEntries(name string, lines []string) {
 	for i, item := range entries {
 		for _, line := range lines {
 			if line == fmt.Sprintf("%s", item.amount) {
-				xlsx.SetCellValue("JDE", "F"+strconv.Itoa(9+i), "match")
+				xlsx.SetCellValue("605", "F"+strconv.Itoa(9+i), "match")
 			}
 		}
 	}
@@ -125,7 +132,7 @@ func main() {
 	fileString := getFileName()
 	//todo ask if user needs to extract pdf amounts, otherwise simply perform comparison
 	lineAmounts := pullPDFAmounts()
-	//todo pdfAmountsToExcel(lineAmounts)
+	pdfAmountsToExcel(lineAmounts)
 	//todo prompt user to continue after pdf cleanup
 	extractEntries(fileString)
 	compareEntries(fileString, lineAmounts[1])

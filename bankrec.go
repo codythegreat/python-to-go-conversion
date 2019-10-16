@@ -23,13 +23,12 @@ type entry struct {
 var entries []entry
 var bankAmounts []string
 var bankAmtReg = regexp.MustCompile(`\d*,?\d+\.\d{2}\-?`)
-
-//todo add two more regex values for descriptions and dates
+var dateDescReg = regexp.MustCompile(`\d{1}\d?\/\d{2}\b[\w\s]*\b`)
 
 //todo add ability to code in pdf doc name and return [2]string of these names
 func getFileName() string {
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Println("Enter the book name containing this months entries: ")
+	fmt.Println("Enter the book name containing this months entries")
 	scanner.Scan()
 	text := scanner.Text()
 	return text
@@ -71,22 +70,34 @@ func extractEntries(name string) {
 	}
 }
 
-//todo add ability to pull descriptions and date as seperate lists
-func pullPDFAmounts() []string {
+func pullPDFAmounts() [2][]string {
+	scanner := bufio.NewScanner(os.Stdin)
+	// ask user for name of pdf file
+	fmt.Println("Enter the name of the bank statement pdf")
+	scanner.Scan()
+	text := scanner.Text()
 	// pull all text from pdf doc
-	res, err := docconv.ConvertPath("bank-statement.pdf")
+	res, err := docconv.ConvertPath(text)
 	if err != nil {
 		fmt.Printf("%v", err)
 	}
+	var slicesRegex [2][]string
 	// use a regex to sort and find only dollar amounts
-	lineAmounts := bankAmtReg.FindAllString(fmt.Sprintf("%s", res), -1)
+	slicesRegex[0] = dateDescReg.FindAllString(fmt.Sprintf("%s", res), -1)
+	slicesRegex[1] = bankAmtReg.FindAllString(fmt.Sprintf("%s", res), -1)
 	// print the resuls and original text
-	fmt.Println(lineAmounts)
-	return lineAmounts
+	return slicesRegex
 }
 func pdfAmountsToExcel(strAmts []string) {
 	// convert amounts to float64
-
+	var pdfAmounts []float64
+	for i, _ := range strAmts {
+		floatAmt, err := strconv.ParseFloat(strAmts[i], 64)
+		if err != nil {
+			fmt.Println(err)
+		}
+		pdfAmounts[i] = floatAmt 
+	}
 	// initialize a new excel sheet
 
 	// input amounts into the excel sheet
@@ -117,5 +128,5 @@ func main() {
 	//todo pdfAmountsToExcel(lineAmounts)
 	//todo prompt user to continue after pdf cleanup
 	extractEntries(fileString)
-	compareEntries(fileString, lineAmounts)
+	compareEntries(fileString, lineAmounts[1])
 }

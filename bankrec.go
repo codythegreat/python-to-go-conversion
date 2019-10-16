@@ -24,7 +24,7 @@ type entry struct {
 var entries []entry
 var bankAmounts []string
 var bankAmtReg = regexp.MustCompile(`\d*,?\d+\.\d{2}\-?`)
-var dateDescReg = regexp.MustCompile(`\d{1}\d?\/\d{2}\b[\w\s]*\b`)
+var dateDescReg = regexp.MustCompile(`\d{1}\d?\/\d{2}\n[\w ]*`)
 
 //todo add ability to code in pdf doc name and return [2]string of these names
 func getFileName() string {
@@ -87,13 +87,13 @@ func pullPDFAmounts() [2][]string {
 	// use a regex to sort and find only dollar amounts
 	slicesRegex[0] = dateDescReg.FindAllString(fmt.Sprintf("%s", res), -1)
 	slicesRegex[1] = bankAmtReg.FindAllString(fmt.Sprintf("%s", res), -1)
-	// print the resuls and original text
+	// print the results and original text
 	return slicesRegex
 }
 func pdfAmountsToExcel(data [2][]string) {
 	var pdfAmounts []float64
 	for i, _ := range data[1] {
-		floatAmt, err := strconv.ParseFloat(strings.Replace(data[1][i],",","", -1), 64)
+		floatAmt, err := strconv.ParseFloat(strings.Replace(data[1][i], ",", "", -1), 64)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -101,18 +101,19 @@ func pdfAmountsToExcel(data [2][]string) {
 	}
 	f := excelize.NewFile()
 	for i, _ := range data[0] {
-		f.SetCellValue("Sheet1", "A" + strconv.Itoa(i), strings.Replace(data[0][i], "\n", "-", -1))
+		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i), strings.Replace(data[0][i], "\n", " - ", -1))
 	}
 	for i, _ := range pdfAmounts {
-		f.SetCellValue("Sheet1", "B" + strconv.Itoa(i), pdfAmounts[i])
+		f.SetCellValue("Sheet1", "B"+strconv.Itoa(i), pdfAmounts[i])
 	}
-    err := f.SaveAs("./Statement.xlsx")
-    if err != nil {
-        fmt.Println(err)
-    }
+	err := f.SaveAs("./Statement.xlsx")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 //todo expand function to look at near matches, dates, description matching, etc
+//todo give a marging of error of 5 cents for matches
 func compareEntries(name string, lines []string) {
 	xlsx, err := excelize.OpenFile(name)
 	if err != nil {

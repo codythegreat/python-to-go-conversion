@@ -121,7 +121,7 @@ func compareEntries(name string, lines []string) {
 	}
 	for i, item := range entries {
 		for _, line := range lines {
-			if line == fmt.Sprintf("%s", item.amount) {
+			if line < fmt.Sprintf("%s", item.amount)+.05 && line > fmt.Sprintf("%s", item.amount)-.05 {
 				xlsx.SetCellValue("605", "F"+strconv.Itoa(9+i), "match")
 			}
 		}

@@ -47,7 +47,7 @@ func extractEntries(name string) {
 		fmt.Println(err)
 	}
 	// extract entries from 605 sheet
-	for currentRow := 9; currentRow <= len(rows); currentRow++ {
+	for currentRow := 2; currentRow <= len(rows); currentRow++ {
 		something, err := xlsx.GetCellValue("605", "E"+strconv.Itoa(currentRow))
 		if err != nil {
 			fmt.Println(err)
@@ -124,9 +124,9 @@ func compareEntries(name string, lines []string) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			if f < item.amount+.05 && f > item.amount-.05 {
-				fmt.Println("success")
-				xlsx.SetCellValue("605", "F"+strconv.Itoa(i), "match")
+			if f < item.amount+.005 && f > item.amount-.005 {
+				fmt.Printf("success - %.2f\n", item.amount)
+				xlsx.SetCellValue("605", "F"+strconv.Itoa(i+2), "match")
 			}
 		}
 	}

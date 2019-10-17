@@ -124,9 +124,9 @@ func compareEntries(name string, lines []string) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			if f < item.amount +.05 && f > item.amount -.05 {
+			if f < item.amount+.05 && f > item.amount-.05 {
 				fmt.Println("success")
-				xlsx.SetCellValue("605", "F"+strconv.Itoa(9+i), "match")
+				xlsx.SetCellValue("605", "F"+strconv.Itoa(i), "match")
 			}
 		}
 	}

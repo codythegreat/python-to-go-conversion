@@ -23,8 +23,8 @@ type entry struct {
 // slice that holds all entries
 var entries []entry
 var bankAmounts []string
-var bankAmtReg = regexp.MustCompile(`\d*,?\d+\.\d{2}\-?`)
-var dateDescReg = regexp.MustCompile(`\d{1}\d?\/\d{2}\n[\w ]*`)
+var bankAmtReg = regexp.MustCompile(`\d*,?\d+\.\d{2}`)
+var dateDescReg = regexp.MustCompile(`\d{1,2}\/\d{2}\n[\w ]*`)
 
 //todo add ability to code in pdf doc name and return [2]string of these names
 func getFileName() string {
@@ -69,7 +69,6 @@ func extractEntries(name string) {
 			date:         dt,
 			explaination: exp})
 	}
-	fmt.Println(entries)
 }
 
 func pullPDFAmounts() [2][]string {
@@ -121,10 +120,19 @@ func compareEntries(name string, lines []string) {
 	}
 	for i, item := range entries {
 		for _, line := range lines {
-			if line < fmt.Sprintf("%s", item.amount)+.05 && line > fmt.Sprintf("%s", item.amount)-.05 {
+			f, err := strconv.ParseFloat(strings.Replace(line, ",", "", -1), 64)
+			if err != nil {
+				fmt.Println(err)
+			}
+			if f < item.amount +.05 && f > item.amount -.05 {
+				fmt.Println("success")
 				xlsx.SetCellValue("605", "F"+strconv.Itoa(9+i), "match")
 			}
 		}
+	}
+	err = xlsx.Save()
+	if err != nil {
+		fmt.Println(err)
 	}
 }
 

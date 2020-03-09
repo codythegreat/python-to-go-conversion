@@ -37,8 +37,8 @@ func main() {
 			commaName = false
 			name = strings.Split(cellBook.GetCellValue("sheet1", "M"+strconv.Itoa(i)), " ")
 		}
-		// avoid "staff", "managers", or other single word names
-		if len(name) < 2 {
+		// avoid and oddly formatted names
+		if len(name) < 2 || len(name[0]) == 0 || len(name[1]) == 0 {
 			continue
 		}
 		// reverse the order to match the PDF's formatting

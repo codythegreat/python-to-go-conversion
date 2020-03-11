@@ -1,5 +1,5 @@
 // app that analyzes bank statement PDF and bank rec excel sheet for matching amounts
-// todo : fix hardcoded file names and work on pulling pdf values into go
+// TODO : fix hardcoded file names and work on pulling pdf values into go
 package main
 
 import (
@@ -26,7 +26,7 @@ var bankAmounts []string
 var bankAmtReg = regexp.MustCompile(`\d*,?\d+\.\d{2}`)
 var dateDescReg = regexp.MustCompile(`\d{1,2}\/\d{2}\n[\w ]*`)
 
-//todo add ability to code in pdf doc name and return [2]string of these names
+//TODO add ability to code in pdf doc name and return [2]string of these names
 func getFileName() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("Enter the book name containing this months entries")
@@ -111,8 +111,8 @@ func pdfAmountsToExcel(data [2][]string) {
 	}
 }
 
-//todo expand function to look at near matches, dates, description matching, etc
-//todo give a marging of error of 5 cents for matches
+//TODO expand function to look at near matches, dates, description matching, etc
+//TODO give a margin of error of 5 cents for matches
 func compareEntries(name string, lines []string) {
 	xlsx, err := excelize.OpenFile(name)
 	if err != nil {
@@ -139,10 +139,10 @@ func compareEntries(name string, lines []string) {
 func main() {
 	// get the name of the book from the user
 	fileString := getFileName()
-	//todo ask if user needs to extract pdf amounts, otherwise simply perform comparison
+	//TODO ask if user needs to extract pdf amounts, otherwise simply perform comparison
 	lineAmounts := pullPDFAmounts()
 	pdfAmountsToExcel(lineAmounts)
-	//todo prompt user to continue after pdf cleanup
+	//TODO prompt user to continue after pdf cleanup
 	extractEntries(fileString)
 	compareEntries(fileString, lineAmounts[1])
 }

@@ -71,7 +71,7 @@ func printMatches() {
 	for _, match := range matches {
 		total += match.amount
 		if match.amount != 0 {
-			fmt.Printf("%f\t%s\t%s\n", match.amount, match.description, match.date)
+			fmt.Printf("%0.2f\t%s\t%s\n", match.amount, match.description, match.date)
 		}
 	}
 	// print total
@@ -135,6 +135,7 @@ func programLoop() {
 	}
 	fmt.Println("Input sheet name:")
 	scanner.Scan()
+	fmt.Println("")
 	text = scanner.Text()
 	// if no sheet name, delete values and start over
 	// else create a new sheet in the master book and write the values to it

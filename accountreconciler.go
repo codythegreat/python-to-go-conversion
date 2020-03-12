@@ -80,7 +80,7 @@ func printMatches() {
 			fmt.Printf("%0.2f%s%s%s%s\n",
 				match.amount,
 				strings.Repeat(" ", 16-len(fmt.Sprintf("%0.2f", match.amount))),
-				match.description[:20],
+				match.description[:30],
 				"        ",
 				match.date)
 		}

@@ -7,7 +7,6 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"os"
 	"strconv"
-	"strings"
 )
 
 // each "match" will assume this struct
@@ -77,11 +76,9 @@ func printMatches() {
 	for _, match := range matches {
 		total += match.amount
 		if match.amount != 0 {
-			fmt.Printf("%0.2f%s%s%s%s\n",
+			fmt.Printf("%-16.2f%-50s%s\n",
 				match.amount,
-				strings.Repeat(" ", 16-len(fmt.Sprintf("%0.2f", match.amount))),
-				match.description[:30],
-				"        ",
+				match.description,
 				match.date)
 		}
 	}

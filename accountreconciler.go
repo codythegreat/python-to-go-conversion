@@ -38,16 +38,22 @@ func extractAmounts() {
 	rows := xlsx.GetRows("Sheet1")
 	// append wanted information from each row to matches
 	for currentRow := 2; currentRow <= len(rows)-4; currentRow++ {
-		floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)), 64)
-		if err != nil {
-			fmt.Printf("%v", err)
+		// if line has no amount, continue
+		if xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)) == "" {
+			continue
+			// otherwise, append to our list of match instances
+		} else {
+			floatAmount, err := strconv.ParseFloat(xlsx.GetCellValue("sheet1", "H"+strconv.Itoa(currentRow)), 64)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			matches = append(matches, outstandingAmount{
+				amount:      floatAmount,
+				date:        xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)),
+				description: xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)),
+				remark:      xlsx.GetCellValue("sheet1", "AJ"+strconv.Itoa(currentRow)),
+				batchNumb:   xlsx.GetCellValue("sheet1", "R"+strconv.Itoa(currentRow))})
 		}
-		matches = append(matches, outstandingAmount{
-			amount:      floatAmount,
-			date:        xlsx.GetCellValue("sheet1", "F"+strconv.Itoa(currentRow)),
-			description: xlsx.GetCellValue("sheet1", "G"+strconv.Itoa(currentRow)),
-			remark:      xlsx.GetCellValue("sheet1", "AJ"+strconv.Itoa(currentRow)),
-			batchNumb:   xlsx.GetCellValue("sheet1", "R"+strconv.Itoa(currentRow))})
 	}
 }
 
